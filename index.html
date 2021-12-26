@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Pallete</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+
+    <div class="page-component">
+        <h1 class="page-heading">
+            Color Pallete Generator
+        </h1>
+
+        <div class="container">
+            <div class="color">
+                <div class="color-box">
+                    <div class="color-view">
+
+                    </div>
+                    <div class="color-hex">
+                        #eeecab
+                    </div>
+                </div>
+            </div>
+
+            <div class="color-box">
+                <div class="color-view" data-background="#eeecab">
+                </div>
+                <div class="color-hex">
+                    #eeecab
+                </div>
+            </div>
+        </div>
+
+        <div class="generator-button">
+            <button class="generate-color">
+                Generate Pallete
+            </button>
+        </div>
+
+        <p class="spacebar-text">
+            or Just Press "Spacebar" to generate new pallete.
+        </p>
+    </div>
+    <!-- The actual snackbar -->
+    <div id="snackbar">Some text some message..</div>
+
+</body>
+
+<script>
+
+    let colors = [];
+
+    $(function () {
+        $('.generate-color').click(generatePallete);
+        generatePallete();
+
+        $(document).keyup(function (e) {
+            if (e.keyCode == 32) {
+                //your code
+                generatePallete();
+            }
+        })
+    });
+
+    function copyToClipboard(e) {
+
+        navigator.clipboard.writeText(copyText.value);
+    }
+
+    function generateRandomHex() {
+
+        let generatedColor = Math.floor(Math.random() * 16777215).toString(16);
+        if (generatedColor.length != 6) {
+            generateRandomHex();
+        }
+        return generatedColor;
+    }
+
+    function generatePallete() {
+        $('.container').empty();
+        colors = [];
+        let color = "";
+        for (let i = 0; i < 5; i++) {
+            color = `#${generateRandomHex()}`;
+            addToPallete(color);
+
+        }
+        generateUI();
+
+        $(".color").click(function (e) {
+            $('.color').removeClass('active');
+            e.preventDefault();
+            const textValue = this.dataset.color;
+            navigator.clipboard.writeText(textValue);
+            let snakcbarText = `Color ${textValue} copied to your clipboard!`
+            showSnackBar(snakcbarText);
+
+            $(this).addClass("active");
+        });
+
+        function generateUI() {
+            let markup = ``;
+
+            colors.map((color, index) => {
+                id = `color_${index}`;
+                markup = `<div class="color" data-color="${color}" id=${id}><div class="color-box">
+                <div class="color-view" >
+                </div>
+                <div class="color-hex">
+                    ${color}
+                </div>
+            </div>
+        </div>`
+
+                $('.container').append(markup);
+                $(`#${id} .color-view`).css("background-color", color);
+            });
+        }
+
+        function addToPallete(color) {
+            if (!colors.includes(color)) {
+                colors.push(color);
+            } else {
+                color = `#${generateRandomHex()}`;
+                addToPallete(color);
+            }
+        }
+    }
+
+    function showSnackBar(snakcbarText) {
+        // Get the snackbar DIV
+        var x = $("#snackbar");
+        x.text(snakcbarText);
+        // Add the "show" class to DIV
+        x.addClass("show");
+
+        // After 3 seconds, remove the show class from DIV
+        setTimeout(function () { x.className = x.removeClass("show"); }, 3000);
+    }
+</script>
+
+</html>
